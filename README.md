@@ -1,10 +1,10 @@
 # Controle-IR
 
-Projeto para controle de dispositivos via infravermelho (IR). Este repositório contém código, documentação e recursos relacionados para enviar e receber sinais IR, mapear códigos de controle remoto e integrar dispositivos IR com sistemas embarcados.
+Projeto para controle de imposto de renda (IR). Este repositório contém código, documentação e recursos relacionados para enviar e receber IR.
 
 ## Sobre
 
-- Objetivo: Fornecer uma base para controlar dispositivos por IR e facilitar a criação de rotinas automatizadas.
+- Objetivo: Fornecer uma base para controlar IR e facilitar a criação de rotinas automatizadas.
 - Estado: Inicial (adapte conforme necessário).
 
 ## Instalação
@@ -16,7 +16,7 @@ git clone https://github.com/rhianmello/controle-ir.git
 cd controle-ir
 ```
 
-2. Siga as instruções específicas do projeto (por exemplo, instalar dependências, configurar hardware). Adicione detalhes aqui conforme o projeto for definido.
+2. Siga as instruções específicas.
 
 ## Uso
 
