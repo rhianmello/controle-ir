@@ -2,90 +2,90 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Controle Financeiro – Imposto de Renda</title>
+  <title>Controle Financeiro – IR Brasil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
-  
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
-  <h1>Controle Financeiro – IR Brasil</h1>
+<h1>Controle Financeiro – Imposto de Renda</h1>
 
-  <!-- =========================
-       CONTRIBUINTE
-  ========================== -->
+<!-- LOGIN -->
+<section id="login">
+  <h2>Login</h2>
+  <input id="loginCpf" placeholder="CPF">
+  <input id="loginSenha" type="password" placeholder="Senha">
+  <button onclick="login()">Entrar / Criar Conta</button>
+</section>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+  <!-- CONTRIBUINTE -->
   <section>
     <h2>Dados do Contribuinte</h2>
-
-    <input type="text" id="nome" placeholder="Nome completo">
-    <input type="text" id="cpf" placeholder="CPF">
-    <input type="text" id="cnpj" placeholder="CNPJ">
+    <input id="nome" placeholder="Nome completo">
+    <input id="cpf" placeholder="CPF" disabled>
+    <input id="cnpj" placeholder="CNPJ">
 
     <select id="tipo">
-      <option value="">Tipo de atividade</option>
-      <option value="MEI">MEI</option>
-      <option value="Simples">Simples Nacional</option>
-      <option value="Autônomo">Autônomo</option>
+      <option value="">Tipo</option>
+      <option>MEI</option>
+      <option>Simples Nacional</option>
+      <option>Autônomo</option>
     </select>
 
-    <button onclick="salvarContribuinte()">Salvar dados</button>
+    <button onclick="salvarContribuinte()">Salvar</button>
   </section>
 
-  <!-- =========================
-       RECEITAS
-  ========================== -->
+  <!-- RECEITAS -->
   <section>
     <h2>Receitas</h2>
-
     <input type="date" id="dataReceita">
-    <input type="number" id="valorReceita" placeholder="Valor da receita">
-    <input type="text" id="descReceita" placeholder="Descrição">
-
-    <button onclick="adicionarReceita()">Salvar Receita</button>
-
+    <input type="number" id="valorReceita" placeholder="Valor">
+    <input id="descReceita" placeholder="Descrição">
+    <button onclick="salvarReceita()">Salvar Receita</button>
     <ul id="listaReceitas"></ul>
   </section>
 
-  <!-- =========================
-       DESPESAS
-  ========================== -->
+  <!-- DESPESAS -->
   <section>
     <h2>Despesas</h2>
-
     <input type="date" id="dataDespesa">
-    <input type="number" id="valorDespesa" placeholder="Valor da despesa">
-    <input type="text" id="catDespesa" placeholder="Categoria (ex: combustível, aluguel)">
-
-    <label>
-      <input type="checkbox" id="dedutivel">
-      Despesa dedutível
-    </label>
-
-    <button onclick="adicionarDespesa()">Salvar Despesa</button>
-
+    <input type="number" id="valorDespesa" placeholder="Valor">
+    <input id="catDespesa" placeholder="Categoria">
+    <label><input type="checkbox" id="dedutivel"> Dedutível</label>
+    <button onclick="salvarDespesa()">Salvar Despesa</button>
     <ul id="listaDespesas"></ul>
   </section>
 
-  <!-- =========================
-       RESUMO
-  ========================== -->
+  <!-- RESUMO -->
   <section>
-    <h2>Resumo Anual</h2>
+    <h2>Resumo</h2>
+    <p>Receitas: R$ <span id="totalReceitas">0</span></p>
+    <p>Despesas: R$ <span id="totalDespesas">0</span></p>
+    <p>Resultado: R$ <span id="resultado">0</span></p>
 
-    <p>Total de Receitas: R$ <strong><span id="totalReceitas">0.00</span></strong></p>
-    <p>Total de Despesas: R$ <strong><span id="totalDespesas">0.00</span></strong></p>
-    <p>Resultado (Lucro/Prejuízo): R$ <strong><span id="resultado">0.00</span></strong></p>
-
-    <button onclick="exportarCSV()">Exportar CSV</button>
-    <button onclick="exportarExcel()">Exportar Excel</button>
-    <button onclick="gerarRelatorioIRPF()">Resumo IRPF</button>
-
-
+    <button onclick="exportarCSV()">CSV</button>
+    <button onclick="exportarExcel()">Excel</button>
+    <button onclick="relatorioIRPF()">IRPF</button>
   </section>
-  
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <script src="script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <canvas id="grafico"></canvas>
+
+  <!-- GRÁFICO -->
+  <section>
+    <h2>Gráfico</h2>
+    <canvas id="grafico"></canvas>
+  </section>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
