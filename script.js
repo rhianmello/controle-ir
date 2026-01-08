@@ -17,6 +17,17 @@ function salvarContribuinte() {
   localStorage.setItem("contribuinte", JSON.stringify(dados));
   alert("Dados do contribuinte salvos!");
 }
+const senhaSalva = localStorage.getItem("senha");
+if (!senhaSalva) {
+  const novaSenha = prompt("Crie uma senha de acesso:");
+  localStorage.setItem("senha", novaSenha);
+} else {
+  const tentativa = prompt("Digite a senha:");
+  if (tentativa !== senhaSalva) {
+    alert("Senha incorreta");
+    document.body.innerHTML = "";
+  }
+}
 
 /* =========================
    RECEITAS
@@ -158,7 +169,16 @@ function limparFormularioDespesa() {
    EXPORTAÇÃO
 ========================= */
 function exportarCSV() {
-  let csv = "Tipo,Data,Valor,Descricao,Categoria,Dedutivel\n";
+  const contribuinte = JSON.parse(localStorage.getItem("contribuinte")) || {};
+
+  let csv = "DADOS DO CONTRIBUINTE\n";
+  csv += `Nome,${contribuinte.nome || ""}\n`;
+  csv += `CPF,${contribuinte.cpf || ""}\n`;
+  csv += `CNPJ,${contribuinte.cnpj || ""}\n`;
+  csv += `Tipo,${contribuinte.tipo || ""}\n\n`;
+
+  csv += "LANÇAMENTOS\n";
+  csv += "Tipo,Data,Valor,Descricao,Categoria,Dedutivel\n";
 
   receitas.forEach(r => {
     csv += `Receita,${r.data},${r.valor},${r.descricao},,\n`;
@@ -171,8 +191,62 @@ function exportarCSV() {
   const blob = new Blob([csv], { type: "text/csv" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "controle_ir.csv";
+  link.download = "relatorio_ir.csv";
   link.click();
+}
+
+function exportarExcel() {
+  const wb = XLSX.utils.book_new();
+  const contribuinte = JSON.parse(localStorage.getItem("contribuinte")) || {};
+
+  const abaContribuinte = XLSX.utils.json_to_sheet([contribuinte]);
+  XLSX.utils.book_append_sheet(wb, abaContribuinte, "Contribuinte");
+
+  const abaReceitas = XLSX.utils.json_to_sheet(receitas);
+  XLSX.utils.book_append_sheet(wb, abaReceitas, "Receitas");
+
+  const abaDespesas = XLSX.utils.json_to_sheet(despesas);
+  XLSX.utils.book_append_sheet(wb, abaDespesas, "Despesas");
+
+  const resumo = [{
+    totalReceitas: totalReceitas.textContent,
+    totalDespesas: totalDespesas.textContent,
+    resultado: resultado.textContent
+  }];
+  const abaResumo = XLSX.utils.json_to_sheet(resumo);
+  XLSX.utils.book_append_sheet(wb, abaResumo, "Resumo");
+
+  XLSX.writeFile(wb, "controle_ir.xlsx");
+}
+
+function gerarRelatorioIRPF() {
+  const totalR = receitas.reduce((s, r) => s + r.valor, 0);
+  const dedutiveis = despesas
+    .filter(d => d.dedutivel)
+    .reduce((s, d) => s + d.valor, 0);
+
+  alert(
+    `RELATÓRIO IRPF\n\n` +
+    `Receita Bruta: R$ ${totalR.toFixed(2)}\n` +
+    `Despesas Dedutíveis: R$ ${dedutiveis.toFixed(2)}\n` +
+    `Resultado Tributável: R$ ${(totalR - dedutiveis).toFixed(2)}`
+  );
+}
+
+function gerarGrafico() {
+  const ctx = document.getElementById("grafico");
+  const totalR = receitas.reduce((s, r) => s + r.valor, 0);
+  const totalD = despesas.reduce((s, d) => s + d.valor, 0);
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Receitas", "Despesas"],
+      datasets: [{
+        data: [totalR, totalD]
+      }]
+    }
+  });
 }
 
 atualizarTela();
