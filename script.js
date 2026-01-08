@@ -6,7 +6,7 @@ let editD = null;
 let grafico = null;
 
 /* ================= LOGIN ================= */
-function login() {
+function fazerLogin() {
   const cpf = loginCpf.value;
   const senha = loginSenha.value;
   const chave = `usuario_${cpf}`;
