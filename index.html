@@ -1,58 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Controle Financeiro – IR Brasil</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Controle Financeiro – Imposto de Renda</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Controle Financeiro – Imposto de Renda</h1>
+  <h1>Controle Financeiro – IR Brasil</h1>
 
-  <!-- Cadastro do Contribuinte -->
+  <!-- =========================
+       CONTRIBUINTE
+  ========================== -->
   <section>
     <h2>Dados do Contribuinte</h2>
-    <input id="nome" placeholder="Nome completo" />
-    <input id="cpf" placeholder="CPF" />
-    <input id="cnpj" placeholder="CNPJ" />
+
+    <input type="text" id="nome" placeholder="Nome completo">
+    <input type="text" id="cpf" placeholder="CPF">
+    <input type="text" id="cnpj" placeholder="CNPJ">
+
     <select id="tipo">
-      <option value="">Tipo</option>
+      <option value="">Tipo de atividade</option>
       <option value="MEI">MEI</option>
       <option value="Simples">Simples Nacional</option>
       <option value="Autônomo">Autônomo</option>
     </select>
-    <button onclick="salvarContribuinte()">Salvar</button>
+
+    <button onclick="salvarContribuinte()">Salvar dados</button>
   </section>
 
-  <!-- Receitas -->
+  <!-- =========================
+       RECEITAS
+  ========================== -->
   <section>
     <h2>Receitas</h2>
-    <input type="date" id="dataReceita" />
-    <input type="number" id="valorReceita" placeholder="Valor" />
-    <input id="descReceita" placeholder="Descrição" />
-    <button onclick="adicionarReceita()">Adicionar Receita</button>
+
+    <input type="date" id="dataReceita">
+    <input type="number" id="valorReceita" placeholder="Valor da receita">
+    <input type="text" id="descReceita" placeholder="Descrição">
+
+    <button onclick="adicionarReceita()">Salvar Receita</button>
+
     <ul id="listaReceitas"></ul>
   </section>
 
-  <!-- Despesas -->
+  <!-- =========================
+       DESPESAS
+  ========================== -->
   <section>
     <h2>Despesas</h2>
-    <input type="date" id="dataDespesa" />
-    <input type="number" id="valorDespesa" placeholder="Valor" />
-    <input id="catDespesa" placeholder="Categoria" />
+
+    <input type="date" id="dataDespesa">
+    <input type="number" id="valorDespesa" placeholder="Valor da despesa">
+    <input type="text" id="catDespesa" placeholder="Categoria (ex: combustível, aluguel)">
+
     <label>
-      <input type="checkbox" id="dedutivel" /> Dedutível
+      <input type="checkbox" id="dedutivel">
+      Despesa dedutível
     </label>
-    <button onclick="adicionarDespesa()">Adicionar Despesa</button>
+
+    <button onclick="adicionarDespesa()">Salvar Despesa</button>
+
     <ul id="listaDespesas"></ul>
   </section>
 
-  <!-- Resumo -->
+  <!-- =========================
+       RESUMO
+  ========================== -->
   <section>
     <h2>Resumo Anual</h2>
-    <p>Total de Receitas: R$ <span id="totalReceitas">0</span></p>
-    <p>Total de Despesas: R$ <span id="totalDespesas">0</span></p>
-    <p>Resultado: R$ <span id="resultado">0</span></p>
+
+    <p>Total de Receitas: R$ <strong><span id="totalReceitas">0.00</span></strong></p>
+    <p>Total de Despesas: R$ <strong><span id="totalDespesas">0.00</span></strong></p>
+    <p>Resultado (Lucro/Prejuízo): R$ <strong><span id="resultado">0.00</span></strong></p>
+
     <button onclick="exportarCSV()">Exportar CSV</button>
   </section>
 
