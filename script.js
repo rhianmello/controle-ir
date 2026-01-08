@@ -1,54 +1,80 @@
-let receitas = JSON.parse(localStorage.getItem("receitas")) || [];
-let despesas = JSON.parse(localStorage.getItem("despesas")) || [];
+let cpfLogado = null;
+let receitas = [];
+let despesas = [];
+let editR = null;
+let editD = null;
+let grafico = null;
 
-let editandoReceita = null;
-let editandoDespesa = null;
+/* ================= LOGIN ================= */
+function login() {
+  const cpf = loginCpf.value;
+  const senha = loginSenha.value;
+  const chave = `usuario_${cpf}`;
 
-/* =========================
-   CONTRIBUINTE
-========================= */
+  let user = JSON.parse(localStorage.getItem(chave));
+
+  if (!user) {
+    user = { senha, contribuinte:{}, receitas:[], despesas:[] };
+    localStorage.setItem(chave, JSON.stringify(user));
+  } else if (user.senha !== senha) {
+    return alert("Senha incorreta");
+  }
+
+  cpfLogado = cpf;
+  carregarDados();
+  login.style.display = "none";
+  app.style.display = "block";
+}
+
+/* ================= STORAGE ================= */
+function salvarTudo() {
+  localStorage.setItem(`usuario_${cpfLogado}`, JSON.stringify({
+    senha: JSON.parse(localStorage.getItem(`usuario_${cpfLogado}`)).senha,
+    contribuinte,
+    receitas,
+    despesas
+  }));
+}
+
+function carregarDados() {
+  const user = JSON.parse(localStorage.getItem(`usuario_${cpfLogado}`));
+  receitas = user.receitas || [];
+  despesas = user.despesas || [];
+  contribuinte = user.contribuinte || {};
+  cpf.value = cpfLogado;
+  nome.value = contribuinte.nome || "";
+  cnpj.value = contribuinte.cnpj || "";
+  tipo.value = contribuinte.tipo || "";
+  atualizarTela();
+}
+
+/* ================= CONTRIBUINTE ================= */
+let contribuinte = {};
 function salvarContribuinte() {
-  const dados = {
+  contribuinte = {
     nome: nome.value,
-    cpf: cpf.value,
+    cpf: cpfLogado,
     cnpj: cnpj.value,
     tipo: tipo.value
   };
-  localStorage.setItem("contribuinte", JSON.stringify(dados));
-  alert("Dados do contribuinte salvos!");
-}
-const senhaSalva = localStorage.getItem("senha");
-if (!senhaSalva) {
-  const novaSenha = prompt("Crie uma senha de acesso:");
-  localStorage.setItem("senha", novaSenha);
-} else {
-  const tentativa = prompt("Digite a senha:");
-  if (tentativa !== senhaSalva) {
-    alert("Senha incorreta");
-    document.body.innerHTML = "";
-  }
+  salvarTudo();
+  alert("Salvo");
 }
 
-/* =========================
-   RECEITAS
-========================= */
-function adicionarReceita() {
-  const receita = {
-    id: Date.now(),
+/* ================= RECEITAS ================= */
+function salvarReceita() {
+  const obj = {
+    id: editR || Date.now(),
     data: dataReceita.value,
     valor: Number(valorReceita.value),
     descricao: descReceita.value
   };
 
-  if (editandoReceita) {
-    receitas = receitas.map(r => r.id === editandoReceita ? receita : r);
-    editandoReceita = null;
-  } else {
-    receitas.push(receita);
-  }
-
-  limparFormularioReceita();
-  salvar();
+  receitas = editR ? receitas.map(r => r.id === editR ? obj : r) : [...receitas, obj];
+  editR = null;
+  limparReceita();
+  salvarTudo();
+  atualizarTela();
 }
 
 function editarReceita(id) {
@@ -56,37 +82,30 @@ function editarReceita(id) {
   dataReceita.value = r.data;
   valorReceita.value = r.valor;
   descReceita.value = r.descricao;
-  editandoReceita = id;
+  editR = id;
 }
 
 function excluirReceita(id) {
-  if (confirm("Deseja excluir esta receita?")) {
-    receitas = receitas.filter(r => r.id !== id);
-    salvar();
-  }
+  receitas = receitas.filter(r => r.id !== id);
+  salvarTudo();
+  atualizarTela();
 }
 
-/* =========================
-   DESPESAS
-========================= */
-function adicionarDespesa() {
-  const despesa = {
-    id: Date.now(),
+/* ================= DESPESAS ================= */
+function salvarDespesa() {
+  const obj = {
+    id: editD || Date.now(),
     data: dataDespesa.value,
     valor: Number(valorDespesa.value),
     categoria: catDespesa.value,
     dedutivel: dedutivel.checked
   };
 
-  if (editandoDespesa) {
-    despesas = despesas.map(d => d.id === editandoDespesa ? despesa : d);
-    editandoDespesa = null;
-  } else {
-    despesas.push(despesa);
-  }
-
-  limparFormularioDespesa();
-  salvar();
+  despesas = editD ? despesas.map(d => d.id === editD ? obj : d) : [...despesas, obj];
+  editD = null;
+  limparDespesa();
+  salvarTudo();
+  atualizarTela();
 }
 
 function editarDespesa(id) {
@@ -95,158 +114,97 @@ function editarDespesa(id) {
   valorDespesa.value = d.valor;
   catDespesa.value = d.categoria;
   dedutivel.checked = d.dedutivel;
-  editandoDespesa = id;
+  editD = id;
 }
 
 function excluirDespesa(id) {
-  if (confirm("Deseja excluir esta despesa?")) {
-    despesas = despesas.filter(d => d.id !== id);
-    salvar();
-  }
-}
-
-/* =========================
-   TELA / STORAGE
-========================= */
-function salvar() {
-  localStorage.setItem("receitas", JSON.stringify(receitas));
-  localStorage.setItem("despesas", JSON.stringify(despesas));
+  despesas = despesas.filter(d => d.id !== id);
+  salvarTudo();
   atualizarTela();
 }
 
+/* ================= TELA ================= */
 function atualizarTela() {
   listaReceitas.innerHTML = "";
   listaDespesas.innerHTML = "";
 
-  let totalR = 0;
-  let totalD = 0;
+  let tr = 0, td = 0;
 
   receitas.forEach(r => {
-    totalR += r.valor;
+    tr += r.valor;
     listaReceitas.innerHTML += `
-      <li>
-        ${r.data} - R$ ${r.valor} - ${r.descricao}
-        <button onclick="editarReceita(${r.id})">✏️</button>
-        <button onclick="excluirReceita(${r.id})">🗑️</button>
-      </li>
-    `;
+      <li>${r.data} - R$ ${r.valor}
+      <button onclick="editarReceita(${r.id})">✏️</button>
+      <button onclick="excluirReceita(${r.id})">🗑️</button></li>`;
   });
 
   despesas.forEach(d => {
-    totalD += d.valor;
+    td += d.valor;
     listaDespesas.innerHTML += `
-      <li>
-        ${d.data} - R$ ${d.valor} - ${d.categoria}
-        ${d.dedutivel ? "(Dedutível)" : ""}
-        <button onclick="editarDespesa(${d.id})">✏️</button>
-        <button onclick="excluirDespesa(${d.id})">🗑️</button>
-      </li>
-    `;
+      <li>${d.data} - R$ ${d.valor}
+      <button onclick="editarDespesa(${d.id})">✏️</button>
+      <button onclick="excluirDespesa(${d.id})">🗑️</button></li>`;
   });
 
-  totalReceitas.textContent = totalR.toFixed(2);
-  totalDespesas.textContent = totalD.toFixed(2);
-  resultado.textContent = (totalR - totalD).toFixed(2);
+  totalReceitas.textContent = tr.toFixed(2);
+  totalDespesas.textContent = td.toFixed(2);
+  resultado.textContent = (tr - td).toFixed(2);
+
+  gerarGrafico(tr, td);
 }
 
-/* =========================
-   UTILITÁRIOS
-========================= */
-function limparFormularioReceita() {
-  dataReceita.value = "";
-  valorReceita.value = "";
-  descReceita.value = "";
-}
-
-function limparFormularioDespesa() {
-  dataDespesa.value = "";
-  valorDespesa.value = "";
-  catDespesa.value = "";
-  dedutivel.checked = false;
-}
-
-/* =========================
-   EXPORTAÇÃO
-========================= */
-function exportarCSV() {
-  const contribuinte = JSON.parse(localStorage.getItem("contribuinte")) || {};
-
-  let csv = "DADOS DO CONTRIBUINTE\n";
-  csv += `Nome,${contribuinte.nome || ""}\n`;
-  csv += `CPF,${contribuinte.cpf || ""}\n`;
-  csv += `CNPJ,${contribuinte.cnpj || ""}\n`;
-  csv += `Tipo,${contribuinte.tipo || ""}\n\n`;
-
-  csv += "LANÇAMENTOS\n";
-  csv += "Tipo,Data,Valor,Descricao,Categoria,Dedutivel\n";
-
-  receitas.forEach(r => {
-    csv += `Receita,${r.data},${r.valor},${r.descricao},,\n`;
-  });
-
-  despesas.forEach(d => {
-    csv += `Despesa,${d.data},${d.valor},,${d.categoria},${d.dedutivel}\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "relatorio_ir.csv";
-  link.click();
-}
-
-function exportarExcel() {
-  const wb = XLSX.utils.book_new();
-  const contribuinte = JSON.parse(localStorage.getItem("contribuinte")) || {};
-
-  const abaContribuinte = XLSX.utils.json_to_sheet([contribuinte]);
-  XLSX.utils.book_append_sheet(wb, abaContribuinte, "Contribuinte");
-
-  const abaReceitas = XLSX.utils.json_to_sheet(receitas);
-  XLSX.utils.book_append_sheet(wb, abaReceitas, "Receitas");
-
-  const abaDespesas = XLSX.utils.json_to_sheet(despesas);
-  XLSX.utils.book_append_sheet(wb, abaDespesas, "Despesas");
-
-  const resumo = [{
-    totalReceitas: totalReceitas.textContent,
-    totalDespesas: totalDespesas.textContent,
-    resultado: resultado.textContent
-  }];
-  const abaResumo = XLSX.utils.json_to_sheet(resumo);
-  XLSX.utils.book_append_sheet(wb, abaResumo, "Resumo");
-
-  XLSX.writeFile(wb, "controle_ir.xlsx");
-}
-
-function gerarRelatorioIRPF() {
-  const totalR = receitas.reduce((s, r) => s + r.valor, 0);
-  const dedutiveis = despesas
-    .filter(d => d.dedutivel)
-    .reduce((s, d) => s + d.valor, 0);
-
-  alert(
-    `RELATÓRIO IRPF\n\n` +
-    `Receita Bruta: R$ ${totalR.toFixed(2)}\n` +
-    `Despesas Dedutíveis: R$ ${dedutiveis.toFixed(2)}\n` +
-    `Resultado Tributável: R$ ${(totalR - dedutiveis).toFixed(2)}`
-  );
-}
-
-function gerarGrafico() {
+/* ================= GRÁFICO ================= */
+function gerarGrafico(tr, td) {
   const ctx = document.getElementById("grafico");
-  const totalR = receitas.reduce((s, r) => s + r.valor, 0);
-  const totalD = despesas.reduce((s, d) => s + d.valor, 0);
+  if (grafico) grafico.destroy();
 
-  new Chart(ctx, {
+  grafico = new Chart(ctx, {
     type: "bar",
     data: {
       labels: ["Receitas", "Despesas"],
       datasets: [{
-        data: [totalR, totalD]
+        data: [tr, td]
       }]
     }
   });
 }
 
-atualizarTela();
+/* ================= RELATÓRIOS ================= */
+function exportarCSV() {
+  let csv = `Nome,${contribuinte.nome}\nCPF,${cpfLogado}\nCNPJ,${contribuinte.cnpj}\n\n`;
+  csv += "Tipo,Data,Valor,Descricao,Categoria,Dedutivel\n";
+
+  receitas.forEach(r => csv += `Receita,${r.data},${r.valor},${r.descricao},,\n`);
+  despesas.forEach(d => csv += `Despesa,${d.data},${d.valor},,${d.categoria},${d.dedutivel}\n`);
+
+  baixar(csv, "relatorio_ir.csv");
+}
+
+function exportarExcel() {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(receitas), "Receitas");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(despesas), "Despesas");
+  XLSX.writeFile(wb, "controle_ir.xlsx");
+}
+
+function relatorioIRPF() {
+  const ded = despesas.filter(d => d.dedutivel).reduce((s,d)=>s+d.valor,0);
+  alert(`Receita: R$ ${totalReceitas.textContent}\nDedutíveis: R$ ${ded}\nTributável: R$ ${(totalReceitas.textContent - ded).toFixed(2)}`);
+}
+
+/* ================= UTILS ================= */
+function baixar(conteudo, nome) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([conteudo]));
+  a.download = nome;
+  a.click();
+}
+
+function limparReceita() {
+  dataReceita.value = valorReceita.value = descReceita.value = "";
+}
+
+function limparDespesa() {
+  dataDespesa.value = valorDespesa.value = catDespesa.value = "";
+  dedutivel.checked = false;
+}
