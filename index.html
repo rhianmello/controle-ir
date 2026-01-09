@@ -22,17 +22,16 @@
   <h2>Login</h2>
   <input id="loginCpf" placeholder="CPF">
   <input id="loginSenha" type="password" placeholder="Senha">
-  <button onclick="login()">Entrar / Criar Conta</button>
+  <button id="btnLogin">Entrar / Criar Conta</button>
 </section>
 
 <!-- APP -->
 <div id="app" style="display:none">
 
-  <!-- CONTRIBUINTE -->
   <section>
     <h2>Dados do Contribuinte</h2>
     <input id="nome" placeholder="Nome completo">
-    <input id="cpf" placeholder="CPF" disabled>
+    <input id="cpf" disabled>
     <input id="cnpj" placeholder="CNPJ">
 
     <select id="tipo">
@@ -42,43 +41,39 @@
       <option>Autônomo</option>
     </select>
 
-    <button onclick="salvarContribuinte()">Salvar</button>
+    <button id="btnSalvarContribuinte">Salvar</button>
   </section>
 
-  <!-- RECEITAS -->
   <section>
     <h2>Receitas</h2>
     <input type="date" id="dataReceita">
     <input type="number" id="valorReceita" placeholder="Valor">
     <input id="descReceita" placeholder="Descrição">
-    <button onclick="salvarReceita()">Salvar Receita</button>
+    <button id="btnSalvarReceita">Salvar Receita</button>
     <ul id="listaReceitas"></ul>
   </section>
 
-  <!-- DESPESAS -->
   <section>
     <h2>Despesas</h2>
     <input type="date" id="dataDespesa">
     <input type="number" id="valorDespesa" placeholder="Valor">
     <input id="catDespesa" placeholder="Categoria">
     <label><input type="checkbox" id="dedutivel"> Dedutível</label>
-    <button onclick="salvarDespesa()">Salvar Despesa</button>
+    <button id="btnSalvarDespesa">Salvar Despesa</button>
     <ul id="listaDespesas"></ul>
   </section>
 
-  <!-- RESUMO -->
   <section>
     <h2>Resumo</h2>
     <p>Receitas: R$ <span id="totalReceitas">0</span></p>
     <p>Despesas: R$ <span id="totalDespesas">0</span></p>
     <p>Resultado: R$ <span id="resultado">0</span></p>
 
-    <button onclick="exportarCSV()">CSV</button>
-    <button onclick="exportarExcel()">Excel</button>
-    <button onclick="relatorioIRPF()">IRPF</button>
+    <button id="btnCSV">CSV</button>
+    <button id="btnExcel">Excel</button>
+    <button id="btnIRPF">IRPF</button>
   </section>
 
-  <!-- GRÁFICO -->
   <section>
     <h2>Gráfico</h2>
     <canvas id="grafico"></canvas>
