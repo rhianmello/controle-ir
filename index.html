@@ -9,6 +9,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js/dist/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -72,18 +73,35 @@
     </div>
   </section>
 
-  <section class="grid-2" id="relatorioPDF">
+  <section class="grid-2 responsive-pdf" id="relatorioPDF">
     <div class="card">
       <h2>Resumo</h2>
       <p>Receitas: R$ <span id="totalReceitas">0</span></p>
       <p>Despesas: R$ <span id="totalDespesas">0</span></p>
       <p>Resultado: R$ <span id="resultado">0</span></p>
-      <button id="btnPDF">Baixar PDF</button>
+
+      <button id="btnPDF">📄 PDF</button>
+      <button id="btnExcel">📊 Excel</button>
     </div>
 
-    <div class="card">
+    <div class="card grafico-card">
       <h2>Gráfico</h2>
       <canvas id="grafico"></canvas>
+    </div>
+  </section>
+
+  <section class="card irpf">
+    <h2>🧾 Demonstrativo – IRPF</h2>
+
+    <div class="irpf-box">
+      <p><strong>Contribuinte:</strong> <span id="irNome"></span></p>
+      <p><strong>CPF:</strong> <span id="irCpf"></span></p>
+      <p><strong>CNPJ:</strong> <span id="irCnpj"></span></p>
+      <hr>
+      <p>Receita Bruta: R$ <span id="irReceita"></span></p>
+      <p>Despesas Dedutíveis: R$ <span id="irDedutivel"></span></p>
+      <p><strong>Base Tributável:</strong> R$ <span id="irBase"></span></p>
+      <small>*Modelo auxiliar – não substitui o programa da Receita Federal</small>
     </div>
   </section>
 
