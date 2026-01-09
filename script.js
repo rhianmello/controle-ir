@@ -3,31 +3,34 @@ let cpfLogado=null, receitas=[], despesas=[], contribuinte={}, editR=null, editD
 
 document.addEventListener("DOMContentLoaded",()=>{
 
-  document.getElementById("btnLogin").onclick = login;
-  document.getElementById("btnResetSenha").onclick = ()=>trocaTela(resetSection,loginSection);
-  document.getElementById("btnCancelarReset").onclick = ()=>trocaTela(loginSection,resetSection);
-  document.getElementById("btnConfirmarReset").onclick = resetarSenha;
+  btnLogin.onclick = login;
+  btnResetSenha.onclick = ()=>trocaTela(resetSection,loginSection);
+  btnCancelarReset.onclick = ()=>trocaTela(loginSection,resetSection);
+  btnConfirmarReset.onclick = resetarSenha;
 
-  document.getElementById("btnSalvarReceita").onclick = salvarReceita;
-  document.getElementById("btnSalvarDespesa").onclick = salvarDespesa;
-  document.getElementById("btnSalvarContribuinte").onclick = salvarContribuinte;
+  btnSalvarReceita.onclick = salvarReceita;
+  btnSalvarDespesa.onclick = salvarDespesa;
+  btnSalvarContribuinte.onclick = salvarContribuinte;
 
-  document.getElementById("btnPDFResumo").onclick = ()=>html2pdf().from(document.querySelector(".responsive-pdf")).save("resumo_ir.pdf");
-  document.getElementById("btnPDFIRPF").onclick = ()=>html2pdf().from(document.getElementById("irpfPDF")).save("irpf.pdf");
-  document.getElementById("btnExcel").onclick = exportarExcel;
+  btnPDFResumo.onclick = ()=>html2pdf().from(document.querySelector(".grid-2")).save("resumo_ir.pdf");
+  btnPDFIRPF.onclick = gerarPDFIRPF;
+  btnExcel.onclick = exportarExcel;
 
-  document.getElementById("loginSenha").addEventListener("keyup",e=>{ if(e.key==="Enter") login(); });
-  document.getElementById("novaSenha").addEventListener("keyup",e=>{ if(e.key==="Enter") resetarSenha(); });
+  loginSenha.addEventListener("keyup",e=>{ if(e.key==="Enter") login(); });
+  novaSenha.addEventListener("keyup",e=>{ if(e.key==="Enter") resetarSenha(); });
 });
 
 function login(){
   const cpf=loginCpf.value.replace(/\D/g,"");
   const senha=loginSenha.value;
-  if(!cpf||!senha) return alert("CPF e senha");
+  if(!cpf||!senha) return alert("CPF e senha obrigatórios");
   const k=`usuario_${cpf}`;
   let u=JSON.parse(localStorage.getItem(k));
-  if(!u){u={senha,contribuinte:{},receitas:[],despesas:[]};localStorage.setItem(k,JSON.stringify(u));}
-  else if(u.senha!==senha) return alert("Senha incorreta");
+  if(!u){
+    u={senha,contribuinte:{},receitas:[],despesas:[]};
+    localStorage.setItem(k,JSON.stringify(u));
+  } else if(u.senha!==senha) return alert("Senha incorreta");
+
   cpfLogado=cpf;
   carregarDados();
   trocaTela(app,loginSection);
@@ -55,7 +58,10 @@ function salvarTudo(){
 function carregarDados(){
   const u=JSON.parse(localStorage.getItem(`usuario_${cpfLogado}`));
   receitas=u.receitas; despesas=u.despesas; contribuinte=u.contribuinte;
-  cpf.value=cpfLogado; nome.value=contribuinte.nome||""; cnpj.value=contribuinte.cnpj||""; tipo.value=contribuinte.tipo||"";
+  cpf.value=cpfLogado;
+  nome.value=contribuinte.nome||"";
+  cnpj.value=contribuinte.cnpj||"";
+  tipo.value=contribuinte.tipo||"";
   atualizarTela();
 }
 
@@ -83,13 +89,15 @@ function atualizarTela(){
   receitas.forEach(r=>{
     tr+=r.valor;
     listaReceitas.innerHTML+=`<li>${r.desc} R$${r.valor}
-    <span><button onclick="editarR(${r.id})">✏️</button><button onclick="excluirR(${r.id})">🗑</button></span></li>`;
+    <span><button onclick="editarR(${r.id})">✏️</button>
+    <button onclick="excluirR(${r.id})">🗑</button></span></li>`;
   });
 
   despesas.forEach(d=>{
     td+=d.valor; if(d.ded) dd+=d.valor;
     listaDespesas.innerHTML+=`<li>${d.cat} R$${d.valor}
-    <span><button onclick="editarD(${d.id})">✏️</button><button onclick="excluirD(${d.id})">🗑</button></span></li>`;
+    <span><button onclick="editarD(${d.id})">✏️</button>
+    <button onclick="excluirD(${d.id})">🗑</button></span></li>`;
   });
 
   totalReceitas.textContent=tr.toFixed(2);
@@ -103,35 +111,50 @@ function atualizarTela(){
   irDedutivel.textContent=dd.toFixed(2);
   irBase.textContent=(tr-dd).toFixed(2);
 
- function gerarGrafico(r,d){
+  gerarGrafico(tr,td);
+}
+
+function editarR(id){const r=receitas.find(x=>x.id===id);editR=id;dataReceita.value=r.data;valorReceita.value=r.valor;descReceita.value=r.desc;}
+function excluirR(id){receitas=receitas.filter(x=>x.id!==id);salvarTudo();atualizarTela();}
+function editarD(id){const d=despesas.find(x=>x.id===id);editD=id;dataDespesa.value=d.data;valorDespesa.value=d.valor;catDespesa.value=d.cat;dedutivel.checked=d.ded;}
+function excluirD(id){despesas=despesas.filter(x=>x.id!==id);salvarTudo();atualizarTela();}
+
+function gerarGrafico(r,d){
   if(grafico) grafico.destroy();
-  grafico=new Chart(document.getElementById("grafico"),{
+  grafico=new Chart(graficoCanvas={
+    canvas:document.getElementById("grafico")
+  }.canvas,{
     type:"bar",
-    data:{
-      labels:["Receitas","Despesas"],
-      datasets:[{
-        data:[r,d]
-      }]
-    },
+    data:{labels:["Receitas","Despesas"],datasets:[{data:[r,d]}]},
     options:{
       responsive:true,
       maintainAspectRatio:false,
-      plugins:{
-        legend:{ display:false }
-      },
-      scales:{
-        y:{ beginAtZero:true }
-      }
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true}}
     }
   });
 }
-
 
 function exportarExcel(){
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(receitas),"Receitas");
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(despesas),"Despesas");
   XLSX.writeFile(wb,"controle_ir.xlsx");
+}
+
+function gerarPDFIRPF(){
+  pdfNome.textContent = contribuinte.nome || "";
+  pdfCpf.textContent = cpfLogado;
+  pdfCnpj.textContent = contribuinte.cnpj || "";
+  pdfReceita.textContent = irReceita.textContent;
+  pdfDedutivel.textContent = irDedutivel.textContent;
+  pdfBase.textContent = irBase.textContent;
+
+  html2pdf().set({
+    margin:15,
+    filename:`IRPF_${cpfLogado}.pdf`,
+    jsPDF:{format:"a4"}
+  }).from(irpfTemplate).save();
 }
 
 function trocaTela(show,hide){
