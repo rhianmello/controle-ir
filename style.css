@@ -1,7 +1,7 @@
 body {
   background:#0f0f0f;
   color:#fff;
-  font-family: Arial, sans-serif;
+  font-family:Arial, sans-serif;
   padding:20px;
   margin:0;
 }
@@ -23,7 +23,11 @@ input, select, button {
   border:none;
 }
 
-button { background:#3a86ff; color:#fff; cursor:pointer; }
+button {
+  background:#3a86ff;
+  color:#fff;
+  cursor:pointer;
+}
 
 .grid-2 {
   display:grid;
@@ -31,7 +35,10 @@ button { background:#3a86ff; color:#fff; cursor:pointer; }
   gap:20px;
 }
 
-ul { list-style:none; padding:0; }
+ul {
+  list-style:none;
+  padding:0;
+}
 
 li {
   background:#2a2a2a;
@@ -44,26 +51,19 @@ li {
 .hidden { display:none; }
 
 .grafico-card {
-  height: 220px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  height:220px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 
 .grafico-card canvas {
-  max-height: 180px !important;
-  width: 100% !important;
-}
-
-
-.irpf { border-left:4px solid #3a86ff; }
-
-.irpf-box {
-  background:#111;
-  padding:10px;
-  border-radius:6px;
+  max-height:180px !important;
+  width:100% !important;
 }
 
 @media(max-width:800px){
-  .grid-2 { grid-template-columns:1fr; }
+  .grid-2 {
+    grid-template-columns:1fr;
+  }
 }
