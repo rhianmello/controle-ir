@@ -2,81 +2,89 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Controle Financeiro – IR Brasil</title>
+  <title>Controle Financeiro IR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- SheetJS -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js/dist/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-<h1>Controle Financeiro – Imposto de Renda</h1>
+<h1>Controle Financeiro – IR Brasil</h1>
 
-<!-- LOGIN -->
-<section id="loginSection">
+<section id="loginSection" class="card">
   <h2>Login</h2>
   <input id="loginCpf" placeholder="CPF">
   <input id="loginSenha" type="password" placeholder="Senha">
-  <button id="btnLogin">Entrar / Criar Conta</button>
+  <div class="actions">
+    <button id="btnLogin">Entrar</button>
+    <button id="btnResetSenha">Esqueci a senha</button>
+  </div>
 </section>
 
-<!-- APP -->
-<div id="app" style="display:none">
+<section id="resetSection" class="card hidden">
+  <h2>Resetar Senha</h2>
+  <input id="resetCpf" placeholder="CPF">
+  <input id="resetPin" type="password" placeholder="PIN Administrativo">
+  <input id="novaSenha" type="password" placeholder="Nova senha">
+  <div class="actions">
+    <button id="btnConfirmarReset">Confirmar</button>
+    <button id="btnCancelarReset">Cancelar</button>
+  </div>
+</section>
 
-  <section>
-    <h2>Dados do Contribuinte</h2>
-    <input id="nome" placeholder="Nome completo">
+<div id="app" class="hidden">
+
+  <section class="card">
+    <h2>Contribuinte</h2>
+    <input id="nome" placeholder="Nome">
     <input id="cpf" disabled>
     <input id="cnpj" placeholder="CNPJ">
-
     <select id="tipo">
       <option value="">Tipo</option>
       <option>MEI</option>
       <option>Simples Nacional</option>
       <option>Autônomo</option>
     </select>
-
     <button id="btnSalvarContribuinte">Salvar</button>
   </section>
 
-  <section>
-    <h2>Receitas</h2>
-    <input type="date" id="dataReceita">
-    <input type="number" id="valorReceita" placeholder="Valor">
-    <input id="descReceita" placeholder="Descrição">
-    <button id="btnSalvarReceita">Salvar Receita</button>
-    <ul id="listaReceitas"></ul>
+  <section class="grid-2">
+    <div class="card">
+      <h2>Receitas</h2>
+      <input type="date" id="dataReceita">
+      <input type="number" id="valorReceita" placeholder="Valor">
+      <input id="descReceita" placeholder="Descrição">
+      <button id="btnSalvarReceita">Salvar</button>
+      <ul id="listaReceitas"></ul>
+    </div>
+
+    <div class="card">
+      <h2>Despesas</h2>
+      <input type="date" id="dataDespesa">
+      <input type="number" id="valorDespesa" placeholder="Valor">
+      <input id="catDespesa" placeholder="Categoria">
+      <label><input type="checkbox" id="dedutivel"> Dedutível</label>
+      <button id="btnSalvarDespesa">Salvar</button>
+      <ul id="listaDespesas"></ul>
+    </div>
   </section>
 
-  <section>
-    <h2>Despesas</h2>
-    <input type="date" id="dataDespesa">
-    <input type="number" id="valorDespesa" placeholder="Valor">
-    <input id="catDespesa" placeholder="Categoria">
-    <label><input type="checkbox" id="dedutivel"> Dedutível</label>
-    <button id="btnSalvarDespesa">Salvar Despesa</button>
-    <ul id="listaDespesas"></ul>
-  </section>
+  <section class="grid-2" id="relatorioPDF">
+    <div class="card">
+      <h2>Resumo</h2>
+      <p>Receitas: R$ <span id="totalReceitas">0</span></p>
+      <p>Despesas: R$ <span id="totalDespesas">0</span></p>
+      <p>Resultado: R$ <span id="resultado">0</span></p>
+      <button id="btnPDF">Baixar PDF</button>
+    </div>
 
-  <section>
-    <h2>Resumo</h2>
-    <p>Receitas: R$ <span id="totalReceitas">0</span></p>
-    <p>Despesas: R$ <span id="totalDespesas">0</span></p>
-    <p>Resultado: R$ <span id="resultado">0</span></p>
-
-    <button id="btnCSV">CSV</button>
-    <button id="btnExcel">Excel</button>
-    <button id="btnIRPF">IRPF</button>
-  </section>
-
-  <section>
-    <h2>Gráfico</h2>
-    <canvas id="grafico"></canvas>
+    <div class="card">
+      <h2>Gráfico</h2>
+      <canvas id="grafico"></canvas>
+    </div>
   </section>
 
 </div>
