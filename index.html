@@ -73,14 +73,14 @@
     </div>
   </section>
 
-  <section class="grid-2 responsive-pdf" id="relatorioPDF">
+  <section class="grid-2 responsive-pdf">
     <div class="card">
       <h2>Resumo</h2>
       <p>Receitas: R$ <span id="totalReceitas">0</span></p>
       <p>Despesas: R$ <span id="totalDespesas">0</span></p>
       <p>Resultado: R$ <span id="resultado">0</span></p>
 
-      <button id="btnPDF">📄 PDF</button>
+      <button id="btnPDFResumo">📄 PDF Resumo</button>
       <button id="btnExcel">📊 Excel</button>
     </div>
 
@@ -90,7 +90,7 @@
     </div>
   </section>
 
-  <section class="card irpf">
+  <section class="card irpf" id="irpfPDF">
     <h2>🧾 Demonstrativo – IRPF</h2>
 
     <div class="irpf-box">
@@ -103,6 +103,8 @@
       <p><strong>Base Tributável:</strong> R$ <span id="irBase"></span></p>
       <small>*Modelo auxiliar – não substitui o programa da Receita Federal</small>
     </div>
+
+    <button id="btnPDFIRPF">🧾 Baixar PDF IRPF</button>
   </section>
 
 </div>
