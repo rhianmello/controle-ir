@@ -43,10 +43,18 @@ li {
 
 .hidden { display:none; }
 
-.grafico-card canvas {
-  width:100%!important;
-  height:250px!important;
+.grafico-card {
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
+.grafico-card canvas {
+  max-height: 180px !important;
+  width: 100% !important;
+}
+
 
 .irpf { border-left:4px solid #3a86ff; }
 
