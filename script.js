@@ -103,22 +103,29 @@ function atualizarTela(){
   irDedutivel.textContent=dd.toFixed(2);
   irBase.textContent=(tr-dd).toFixed(2);
 
-  gerarGrafico(tr,td);
-}
-
-function editarR(id){const r=receitas.find(x=>x.id===id);editR=id;dataReceita.value=r.data;valorReceita.value=r.valor;descReceita.value=r.desc;}
-function excluirR(id){receitas=receitas.filter(x=>x.id!==id);salvarTudo();atualizarTela();}
-function editarD(id){const d=despesas.find(x=>x.id===id);editD=id;dataDespesa.value=d.data;valorDespesa.value=d.valor;catDespesa.value=d.cat;dedutivel.checked=d.ded;}
-function excluirD(id){despesas=despesas.filter(x=>x.id!==id);salvarTudo();atualizarTela();}
-
-function gerarGrafico(r,d){
+ function gerarGrafico(r,d){
   if(grafico) grafico.destroy();
   grafico=new Chart(document.getElementById("grafico"),{
     type:"bar",
-    data:{labels:["Receitas","Despesas"],datasets:[{data:[r,d]}]},
-    options:{responsive:true,maintainAspectRatio:false}
+    data:{
+      labels:["Receitas","Despesas"],
+      datasets:[{
+        data:[r,d]
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{ display:false }
+      },
+      scales:{
+        y:{ beginAtZero:true }
+      }
+    }
   });
 }
+
 
 function exportarExcel(){
   const wb=XLSX.utils.book_new();
