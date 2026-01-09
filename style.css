@@ -3,6 +3,7 @@ body {
   color:#fff;
   font-family: Arial, sans-serif;
   padding:20px;
+  margin:0;
 }
 
 h1 {
@@ -20,7 +21,7 @@ h1 {
 input, select, button {
   width:100%;
   padding:8px;
-  margin:5px 0;
+  margin:6px 0;
   border-radius:5px;
   border:none;
 }
@@ -29,10 +30,6 @@ button {
   background:#3a86ff;
   color:#fff;
   cursor:pointer;
-}
-
-button:hover {
-  opacity:0.85;
 }
 
 .grid-2 {
@@ -52,18 +49,41 @@ li {
   padding:6px;
   display:flex;
   justify-content:space-between;
-}
-
-.actions button {
-  margin-top:10px;
+  align-items:center;
 }
 
 .hidden {
   display:none;
 }
 
-@media(max-width:800px){
-  .grid-2 {
+.grafico-card canvas {
+  width:100% !important;
+  height:auto !important;
+}
+
+/* IRPF */
+.irpf {
+  border-left:4px solid #3a86ff;
+}
+
+.irpf-box {
+  background:#111;
+  padding:10px;
+  border-radius:6px;
+}
+
+/* MOBILE */
+@media (max-width: 800px) {
+  body {
+    padding:10px;
+  }
+
+  .grid-2,
+  .responsive-pdf {
     grid-template-columns:1fr;
+  }
+
+  canvas {
+    max-width:100%;
   }
 }
