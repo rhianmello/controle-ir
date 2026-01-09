@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Controle Financeiro IR</title>
+  <title>Controle Financeiro IRPF</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="style.css">
@@ -19,10 +19,8 @@
   <h2>Login</h2>
   <input id="loginCpf" placeholder="CPF">
   <input id="loginSenha" type="password" placeholder="Senha">
-  <div class="actions">
-    <button id="btnLogin">Entrar</button>
-    <button id="btnResetSenha">Esqueci a senha</button>
-  </div>
+  <button id="btnLogin">Entrar</button>
+  <button id="btnResetSenha">Esqueci a senha</button>
 </section>
 
 <section id="resetSection" class="card hidden">
@@ -30,10 +28,8 @@
   <input id="resetCpf" placeholder="CPF">
   <input id="resetPin" type="password" placeholder="PIN Administrativo">
   <input id="novaSenha" type="password" placeholder="Nova senha">
-  <div class="actions">
-    <button id="btnConfirmarReset">Confirmar</button>
-    <button id="btnCancelarReset">Cancelar</button>
-  </div>
+  <button id="btnConfirmarReset">Confirmar</button>
+  <button id="btnCancelarReset">Cancelar</button>
 </section>
 
 <div id="app" class="hidden">
@@ -73,7 +69,7 @@
     </div>
   </section>
 
-  <section class="grid-2 responsive-pdf">
+  <section class="grid-2">
     <div class="card">
       <h2>Resumo</h2>
       <p>Receitas: R$ <span id="totalReceitas">0</span></p>
@@ -90,23 +86,42 @@
     </div>
   </section>
 
-  <section class="card irpf" id="irpfPDF">
-    <h2>🧾 Demonstrativo – IRPF</h2>
-
-    <div class="irpf-box">
-      <p><strong>Contribuinte:</strong> <span id="irNome"></span></p>
-      <p><strong>CPF:</strong> <span id="irCpf"></span></p>
-      <p><strong>CNPJ:</strong> <span id="irCnpj"></span></p>
-      <hr>
-      <p>Receita Bruta: R$ <span id="irReceita"></span></p>
-      <p>Despesas Dedutíveis: R$ <span id="irDedutivel"></span></p>
-      <p><strong>Base Tributável:</strong> R$ <span id="irBase"></span></p>
-      <small>*Modelo auxiliar – não substitui o programa da Receita Federal</small>
-    </div>
+  <section class="card">
+    <h2>🧾 Demonstrativo IRPF</h2>
+    <p>Contribuinte: <span id="irNome"></span></p>
+    <p>CPF: <span id="irCpf"></span></p>
+    <p>CNPJ: <span id="irCnpj"></span></p>
+    <p>Receita Bruta: R$ <span id="irReceita"></span></p>
+    <p>Despesas Dedutíveis: R$ <span id="irDedutivel"></span></p>
+    <p><strong>Base Tributável:</strong> R$ <span id="irBase"></span></p>
 
     <button id="btnPDFIRPF">🧾 Baixar PDF IRPF</button>
   </section>
 
+</div>
+
+<!-- TEMPLATE OCULTO PARA PDF IRPF (SOMENTE TEXTO) -->
+<div id="irpfTemplate" style="display:none; font-family:Arial; font-size:12px;">
+  <h2 style="text-align:center;">DEMONSTRATIVO AUXILIAR – IRPF</h2>
+
+  <p><strong>Contribuinte:</strong> <span id="pdfNome"></span></p>
+  <p><strong>CPF:</strong> <span id="pdfCpf"></span></p>
+  <p><strong>CNPJ:</strong> <span id="pdfCnpj"></span></p>
+
+  <hr>
+
+  <p><strong>Receita Bruta Total:</strong> R$ <span id="pdfReceita"></span></p>
+  <p><strong>Despesas Dedutíveis:</strong> R$ <span id="pdfDedutivel"></span></p>
+
+  <hr>
+
+  <p><strong>Base de Cálculo Estimada:</strong> R$ <span id="pdfBase"></span></p>
+
+  <br>
+  <small>
+    Documento auxiliar para organização financeira.  
+    Não substitui o programa oficial da Receita Federal do Brasil.
+  </small>
 </div>
 
 <script src="script.js"></script>
