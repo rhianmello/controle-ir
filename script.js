@@ -1,89 +1,128 @@
-body {
-  background:#0f0f0f;
-  color:#fff;
-  font-family: Arial, sans-serif;
-  padding:20px;
-  margin:0;
+const PIN_ADMIN = "9999";
+let cpfLogado=null, receitas=[], despesas=[], contribuinte={}, editR=null, editD=null, grafico=null;
+
+document.addEventListener("DOMContentLoaded",()=>{
+  btnLogin.onclick=login;
+  btnResetSenha.onclick=()=>trocaTela(resetSection,loginSection);
+  btnCancelarReset.onclick=()=>trocaTela(loginSection,resetSection);
+  btnConfirmarReset.onclick=resetarSenha;
+  btnSalvarReceita.onclick=salvarReceita;
+  btnSalvarDespesa.onclick=salvarDespesa;
+  btnSalvarContribuinte.onclick=salvarContribuinte;
+  btnPDF.onclick=gerarPDF;
+  btnExcel.onclick=exportarExcel;
+});
+
+function login(){
+  const cpf=loginCpf.value.replace(/\D/g,"");
+  const senha=loginSenha.value;
+  if(!cpf||!senha) return alert("CPF e senha");
+  const k=`usuario_${cpf}`;
+  let u=JSON.parse(localStorage.getItem(k));
+  if(!u){u={senha,contribuinte:{},receitas:[],despesas:[]};localStorage.setItem(k,JSON.stringify(u));}
+  else if(u.senha!==senha) return alert("Senha incorreta");
+  cpfLogado=cpf;
+  carregarDados();
+  trocaTela(app,loginSection);
 }
 
-h1 {
-  text-align:center;
-  margin-bottom:20px;
+function resetarSenha(){
+  if(resetPin.value!==PIN_ADMIN) return alert("PIN inválido");
+  const cpf=resetCpf.value.replace(/\D/g,"");
+  const k=`usuario_${cpf}`;
+  let u=JSON.parse(localStorage.getItem(k));
+  if(!u) return alert("CPF não encontrado");
+  u.senha=novaSenha.value;
+  localStorage.setItem(k,JSON.stringify(u));
+  alert("Senha alterada");
+  trocaTela(loginSection,resetSection);
 }
 
-.card {
-  background:#1c1c1c;
-  padding:15px;
-  border-radius:8px;
-  margin-bottom:20px;
+function salvarTudo(){
+  localStorage.setItem(`usuario_${cpfLogado}`,JSON.stringify({
+    senha:JSON.parse(localStorage.getItem(`usuario_${cpfLogado}`)).senha,
+    contribuinte,receitas,despesas
+  }));
 }
 
-input, select, button {
-  width:100%;
-  padding:8px;
-  margin:6px 0;
-  border-radius:5px;
-  border:none;
+function carregarDados(){
+  const u=JSON.parse(localStorage.getItem(`usuario_${cpfLogado}`));
+  receitas=u.receitas; despesas=u.despesas; contribuinte=u.contribuinte;
+  cpf.value=cpfLogado; nome.value=contribuinte.nome||""; cnpj.value=contribuinte.cnpj||""; tipo.value=contribuinte.tipo||"";
+  atualizarTela();
 }
 
-button {
-  background:#3a86ff;
-  color:#fff;
-  cursor:pointer;
+function salvarContribuinte(){
+  contribuinte={nome:nome.value,cpf:cpfLogado,cnpj:cnpj.value,tipo:tipo.value};
+  salvarTudo();
+  atualizarTela();
 }
 
-.grid-2 {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
+function salvarReceita(){
+  const o={id:editR||Date.now(),data:dataReceita.value,valor:+valorReceita.value,desc:descReceita.value};
+  receitas=editR?receitas.map(r=>r.id===editR?o:r):[...receitas,o];
+  editR=null; salvarTudo(); atualizarTela();
 }
 
-ul {
-  list-style:none;
-  padding:0;
+function salvarDespesa(){
+  const o={id:editD||Date.now(),data:dataDespesa.value,valor:+valorDespesa.value,cat:catDespesa.value,ded:dedutivel.checked};
+  despesas=editD?despesas.map(d=>d.id===editD?o:d):[...despesas,o];
+  editD=null; salvarTudo(); atualizarTela();
 }
 
-li {
-  background:#2a2a2a;
-  margin:5px 0;
-  padding:6px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+function atualizarTela(){
+  listaReceitas.innerHTML=""; listaDespesas.innerHTML="";
+  let tr=0,td=0,dd=0;
+
+  receitas.forEach(r=>{
+    tr+=r.valor;
+    listaReceitas.innerHTML+=`<li>${r.desc} R$${r.valor}
+    <span><button onclick="editarR(${r.id})">✏️</button>
+    <button onclick="excluirR(${r.id})">🗑</button></span></li>`;
+  });
+
+  despesas.forEach(d=>{
+    td+=d.valor; if(d.ded) dd+=d.valor;
+    listaDespesas.innerHTML+=`<li>${d.cat} R$${d.valor}
+    <span><button onclick="editarD(${d.id})">✏️</button>
+    <button onclick="excluirD(${d.id})">🗑</button></span></li>`;
+  });
+
+  totalReceitas.textContent=tr.toFixed(2);
+  totalDespesas.textContent=td.toFixed(2);
+  resultado.textContent=(tr-td).toFixed(2);
+
+  irNome.textContent=contribuinte.nome||"";
+  irCpf.textContent=cpfLogado;
+  irCnpj.textContent=contribuinte.cnpj||"";
+  irReceita.textContent=tr.toFixed(2);
+  irDedutivel.textContent=dd.toFixed(2);
+  irBase.textContent=(tr-dd).toFixed(2);
+
+  gerarGrafico(tr,td);
 }
 
-.hidden {
-  display:none;
+function editarR(id){const r=receitas.find(x=>x.id===id);editR=id;dataReceita.value=r.data;valorReceita.value=r.valor;descReceita.value=r.desc;}
+function excluirR(id){receitas=receitas.filter(x=>x.id!==id);salvarTudo();atualizarTela();}
+function editarD(id){const d=despesas.find(x=>x.id===id);editD=id;dataDespesa.value=d.data;valorDespesa.value=d.valor;catDespesa.value=d.cat;dedutivel.checked=d.ded;}
+function excluirD(id){despesas=despesas.filter(x=>x.id!==id);salvarTudo();atualizarTela();}
+
+function gerarGrafico(r,d){
+  if(grafico) grafico.destroy();
+  grafico=new Chart(document.getElementById("grafico"),{
+    type:"bar",
+    data:{labels:["Receitas","Despesas"],datasets:[{data:[r,d]}]},
+    options:{responsive:true,maintainAspectRatio:false}
+  });
 }
 
-.grafico-card canvas {
-  width:100% !important;
-  height:auto !important;
+function gerarPDF(){html2pdf().from(document.getElementById("relatorioPDF")).save("relatorio_ir.pdf");}
+
+function exportarExcel(){
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(receitas),"Receitas");
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(despesas),"Despesas");
+  XLSX.writeFile(wb,"controle_ir.xlsx");
 }
 
-/* IRPF */
-.irpf {
-  border-left:4px solid #3a86ff;
-}
-
-.irpf-box {
-  background:#111;
-  padding:10px;
-  border-radius:6px;
-}
-
-/* MOBILE */
-@media (max-width: 800px) {
-  body {
-    padding:10px;
-  }
-
-  .grid-2,
-  .responsive-pdf {
-    grid-template-columns:1fr;
-  }
-
-  canvas {
-    max-width:100%;
-  }
-}
+function trocaTela(show,hide){show.classList.remove("hidden");hide.classList.add("hidden");}
