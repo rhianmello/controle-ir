@@ -2,15 +2,22 @@ const PIN_ADMIN = "9999";
 let cpfLogado=null, receitas=[], despesas=[], contribuinte={}, editR=null, editD=null, grafico=null;
 
 document.addEventListener("DOMContentLoaded",()=>{
-  btnLogin.onclick=login;
-  btnResetSenha.onclick=()=>trocaTela(resetSection,loginSection);
-  btnCancelarReset.onclick=()=>trocaTela(loginSection,resetSection);
-  btnConfirmarReset.onclick=resetarSenha;
-  btnSalvarReceita.onclick=salvarReceita;
-  btnSalvarDespesa.onclick=salvarDespesa;
-  btnSalvarContribuinte.onclick=salvarContribuinte;
-  btnPDF.onclick=gerarPDF;
-  btnExcel.onclick=exportarExcel;
+
+  document.getElementById("btnLogin").onclick = login;
+  document.getElementById("btnResetSenha").onclick = ()=>trocaTela(resetSection,loginSection);
+  document.getElementById("btnCancelarReset").onclick = ()=>trocaTela(loginSection,resetSection);
+  document.getElementById("btnConfirmarReset").onclick = resetarSenha;
+
+  document.getElementById("btnSalvarReceita").onclick = salvarReceita;
+  document.getElementById("btnSalvarDespesa").onclick = salvarDespesa;
+  document.getElementById("btnSalvarContribuinte").onclick = salvarContribuinte;
+
+  document.getElementById("btnPDFResumo").onclick = ()=>html2pdf().from(document.querySelector(".responsive-pdf")).save("resumo_ir.pdf");
+  document.getElementById("btnPDFIRPF").onclick = ()=>html2pdf().from(document.getElementById("irpfPDF")).save("irpf.pdf");
+  document.getElementById("btnExcel").onclick = exportarExcel;
+
+  document.getElementById("loginSenha").addEventListener("keyup",e=>{ if(e.key==="Enter") login(); });
+  document.getElementById("novaSenha").addEventListener("keyup",e=>{ if(e.key==="Enter") resetarSenha(); });
 });
 
 function login(){
@@ -34,7 +41,7 @@ function resetarSenha(){
   if(!u) return alert("CPF não encontrado");
   u.senha=novaSenha.value;
   localStorage.setItem(k,JSON.stringify(u));
-  alert("Senha alterada");
+  alert("Senha redefinida");
   trocaTela(loginSection,resetSection);
 }
 
@@ -54,8 +61,7 @@ function carregarDados(){
 
 function salvarContribuinte(){
   contribuinte={nome:nome.value,cpf:cpfLogado,cnpj:cnpj.value,tipo:tipo.value};
-  salvarTudo();
-  atualizarTela();
+  salvarTudo(); atualizarTela();
 }
 
 function salvarReceita(){
@@ -77,15 +83,13 @@ function atualizarTela(){
   receitas.forEach(r=>{
     tr+=r.valor;
     listaReceitas.innerHTML+=`<li>${r.desc} R$${r.valor}
-    <span><button onclick="editarR(${r.id})">✏️</button>
-    <button onclick="excluirR(${r.id})">🗑</button></span></li>`;
+    <span><button onclick="editarR(${r.id})">✏️</button><button onclick="excluirR(${r.id})">🗑</button></span></li>`;
   });
 
   despesas.forEach(d=>{
     td+=d.valor; if(d.ded) dd+=d.valor;
     listaDespesas.innerHTML+=`<li>${d.cat} R$${d.valor}
-    <span><button onclick="editarD(${d.id})">✏️</button>
-    <button onclick="excluirD(${d.id})">🗑</button></span></li>`;
+    <span><button onclick="editarD(${d.id})">✏️</button><button onclick="excluirD(${d.id})">🗑</button></span></li>`;
   });
 
   totalReceitas.textContent=tr.toFixed(2);
@@ -116,8 +120,6 @@ function gerarGrafico(r,d){
   });
 }
 
-function gerarPDF(){html2pdf().from(document.getElementById("relatorioPDF")).save("relatorio_ir.pdf");}
-
 function exportarExcel(){
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(receitas),"Receitas");
@@ -125,4 +127,7 @@ function exportarExcel(){
   XLSX.writeFile(wb,"controle_ir.xlsx");
 }
 
-function trocaTela(show,hide){show.classList.remove("hidden");hide.classList.add("hidden");}
+function trocaTela(show,hide){
+  show.classList.remove("hidden");
+  hide.classList.add("hidden");
+}
